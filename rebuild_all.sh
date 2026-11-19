@@ -24,8 +24,9 @@ else
 fi
 echo "=== UI smoke test ==="
 if [ "${SKIP_UI:-0}" != "1" ]; then
-  if [ ! -d node_modules/jsdom ]; then
-    npm ci --silent
+  if ! node -e "require('jsdom')" >/dev/null 2>&1; then
+    echo "Installing locked UI test dependencies (npm ci)..."
+    npm ci
   fi
   REQUIRE_UI=1 node verify_ui.js
 else

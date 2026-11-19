@@ -28,6 +28,8 @@ import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
+import atomic
+
 from bs4 import BeautifulSoup
 
 ROOT = Path(__file__).resolve().parent
@@ -472,7 +474,7 @@ def main() -> int:
         "fetch_errors": FETCH_ERRORS,
     }
     DATA.parent.mkdir(parents=True, exist_ok=True)
-    DATA.write_text(json.dumps(payload, indent=1, ensure_ascii=False), encoding="utf-8")
+    atomic.write(DATA, json.dumps(payload, indent=1, ensure_ascii=False))
 
     standards = sum(len(s["levels"][l]["standards"]) for s in subjects for l in ("1", "2", "3"))
     docs = sum(len(std["documents"]) for s in subjects for l in ("1", "2", "3") for std in s["levels"][l]["standards"])

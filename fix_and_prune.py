@@ -23,6 +23,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import scrape
 from pathlib import Path
 
+import atomic
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data" / "subjects.json"
 REPORT = ROOT / "data" / "link_report.json"
@@ -174,8 +176,8 @@ def main() -> int:
         ))
         print(f"  ! {len(scrape.FETCH_ERRORS)} transient link-check error(s) recorded")
     # Write the report first: a failure here leaves the source data untouched.
-    REPORT.write_text(json.dumps({"statuses": {k: v for k, v in statuses.items()}, "dead": dead}, indent=1), encoding="utf-8")
-    DATA.write_text(json.dumps(payload, indent=1, ensure_ascii=False), encoding="utf-8")
+    atomic.write(REPORT, json.dumps({"statuses": {k: v for k, v in statuses.items()}, "dead": dead}, indent=1))
+    atomic.write(DATA, json.dumps(payload, indent=1, ensure_ascii=False))
 
     print(f"\nReport: {dict(stats)}")
     print(f"Live PDF URLs: {payload['prune_report']['urls_live']:,}/{len(urls):,}")

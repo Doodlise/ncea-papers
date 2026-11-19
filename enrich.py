@@ -10,6 +10,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import atomic
+
 import scrape
 
 ROOT = Path(__file__).resolve().parent
@@ -33,7 +35,7 @@ def main() -> int:
     # Make sure failures from this pass are carried into the payload too.
     existing = payload.get("fetch_errors", [])
     payload["fetch_errors"] = existing + [e for e in scrape.FETCH_ERRORS if e not in existing]
-    DATA.write_text(json.dumps(payload, indent=1, ensure_ascii=False), encoding="utf-8")
+    atomic.write(DATA, json.dumps(payload, indent=1, ensure_ascii=False))
 
     stds = sum(len(s["levels"][l]["standards"]) for s in payload["subjects"] for l in ("1", "2", "3"))
     print(f"\nstandards: {stds}, fetch errors: {len(payload['fetch_errors'])}")

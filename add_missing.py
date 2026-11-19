@@ -18,6 +18,8 @@ from datetime import datetime, timezone
 import urllib.request
 from pathlib import Path
 
+import atomic
+
 import fix_and_prune
 import focus
 import scrape
@@ -283,7 +285,7 @@ def main() -> int:
             for std in s["levels"][l]["standards"] for d in std["documents"]
         }
         report["statuses"] = {u: v for u, v in report["statuses"].items() if u in final_urls}
-        REPORT.write_text(json.dumps(report, indent=1), encoding="utf-8")
+        atomic.write(REPORT, json.dumps(report, indent=1))
     if "focus_report" in payload:
         payload["focus_report"].update({
             "subjects_after": len(payload["subjects"]),
@@ -292,7 +294,7 @@ def main() -> int:
                                         for l in ("1", "2", "3") for st in s["levels"][l]["standards"]),
         })
     payload["generated"] = datetime.now(timezone.utc).isoformat()
-    DATA.write_text(json.dumps(payload, indent=1, ensure_ascii=False), encoding="utf-8")
+    atomic.write(DATA, json.dumps(payload, indent=1, ensure_ascii=False))
     print(f"added {added_subjects} subjects, {len(added_urls)} new PDFs; total {len(payload['subjects'])} subjects")
     return 0
 

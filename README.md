@@ -50,7 +50,7 @@ cd ncea-papers
 ../.venv/bin/python build.py
 ../.venv/bin/python verify.py
 ../.venv/bin/python test_links.py    # rotating live spot-check (required unless SKIP_LINK_SAMPLE=1)
-npm install --no-save jsdom@22       # once, for the UI smoke test
+npm ci                               # locked install for the UI smoke test
 node verify_ui.js                    # behavioural checks (required unless SKIP_UI=1)
 ```
 

@@ -260,8 +260,9 @@ def main() -> int:
     ui_calls = len(re.findall(r"^\s*check\(", ui_js, re.M))
     check(ui_calls == 23, f"UI smoke suite has exactly 23 checks (found {ui_calls})")
     rebuild = read(ROOT / "rebuild_all.sh")
-    check("REQUIRE_UI=1" in rebuild and "SKIP_LINK_SAMPLE" in rebuild,
-          "pipeline wires fatal UI test and link-sample opt-out")
+    check(bool(re.search(r"^\s*\.\./\.venv/bin/python test_links\.py\s*$", rebuild, re.M))
+          and bool(re.search(r"^\s*REQUIRE_UI=1 node verify_ui\.js\s*$", rebuild, re.M)),
+          "pipeline invokes both live check commands")
     if (ROOT / "data.js").exists():
         js = read(ROOT / "data.js")
         check(js.startswith("window.NCEA_DATA = "), "data.js assigns window.NCEA_DATA")

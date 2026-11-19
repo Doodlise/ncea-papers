@@ -11,6 +11,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import atomic
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data" / "subjects.json"
 BASE = ROOT / "data" / "baseline.json"
@@ -29,7 +31,7 @@ def main() -> int:
             for std in s["levels"][lvl]["standards"]
         ),
     }
-    BASE.write_text(json.dumps(baseline, indent=1), encoding="utf-8")
+    atomic.write(BASE, json.dumps(baseline, indent=1))
     print(f"baseline refreshed: {len(baseline['subjects'])} subjects, {len(baseline['standards'])} standards")
     return 0
 

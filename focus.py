@@ -18,6 +18,8 @@ import re
 import urllib.parse
 from pathlib import Path
 
+import atomic
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data" / "subjects.json"
 
@@ -232,7 +234,7 @@ def main() -> int:
         "papers_and_schedules": n_docs,
         "dropped_no_papers": dropped_no_papers,
     }
-    DATA.write_text(json.dumps(payload, indent=1, ensure_ascii=False), encoding="utf-8")
+    atomic.write(DATA, json.dumps(payload, indent=1, ensure_ascii=False))
     print(f"Subjects: {before} -> {len(payload['subjects'])} (external papers only)")
     print(f"standards: {n_std}, papers/schedules: {n_docs}")
     return 0
