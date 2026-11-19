@@ -26,6 +26,9 @@ function boot(url, seed) {
   return w;
 }
 
+// Self-derived expectation: adding/removing a check updates the floor automatically.
+const EXPECTED_UI_CHECKS = (fs.readFileSync(__filename, "utf8").match(/^\s*check\(/gm) || []).length;
+
 let failures = 0;
 let executed = 0;
 function check(ok, name) {
@@ -167,15 +170,17 @@ async function finish() {
     const m = h4.textContent.match(/^(\d{5}) —/);
     if (!m) continue;
     const labels = [], hrefs = [];
+    let note = false;
     let node = h4.nextElementSibling;
     while (node && node.tagName !== "H4") {
+      if (node.textContent.includes("No question paper is listed")) note = true;
       node.querySelectorAll('a[class^="pdf-"]').forEach(a => {
         labels.push(a.textContent);
         hrefs.push(a.getAttribute("href"));
       });
       node = node.nextElementSibling;
     }
-    staticMap.set(m[1], { labels, hrefs });
+    staticMap.set(m[1], { labels, hrefs, note });
   }
   let parityBad = [];
   for (const num of numbers) {
@@ -183,12 +188,12 @@ async function finish() {
     pd.getElementById("jump-go").click();
     const anchors = [...pd.querySelectorAll("#files tbody a")];
     const expected = staticMap.get(num) || { labels: [], hrefs: [] };
-    const actual = {
-      labels: anchors.map(a => a.textContent),
-      hrefs: anchors.map(a => a.getAttribute("href")),
-    };
-    if (!actual.labels.length || actual.labels.join("|") !== expected.labels.join("|")
-        || actual.hrefs.join("|") !== expected.hrefs.join("|")) parityBad.push(num);
+    const actual_labels = anchors.map(a => a.textContent);
+    const actual_hrefs = anchors.map(a => a.getAttribute("href"));
+    const note = pd.getElementById("files").textContent.includes("No question paper is listed");
+    if (!actual_labels.length || actual_labels.join("|") !== expected.labels.join("|")
+        || actual_hrefs.join("|") !== expected.hrefs.join("|")
+        || note !== expected.note) parityBad.push(num);
   }
   check(parityBad.length === 0,
         `picker/static labels and URLs match for all ${numbers.length} standards (bad: ${parityBad.slice(0, 5)})`);
@@ -206,8 +211,8 @@ async function finish() {
         && bd.querySelectorAll("#files a").length === 0,
         "popstate/back fully resets the picker");
 
-  if (executed < 29) {
-    console.log(`FAIL only ${executed} UI checks executed (expected at least 29)`);
+  if (executed < EXPECTED_UI_CHECKS) {
+    console.log(`FAIL only ${executed} UI checks executed (expected ${EXPECTED_UI_CHECKS})`);
     process.exit(1);
   }
   console.log(`UI checks executed: ${executed}`);

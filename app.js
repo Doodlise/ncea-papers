@@ -94,7 +94,6 @@
       lastHash = "";
       clearSaved();
       levelEl.value = "";
-      if (jumpEl) jumpEl.value = "";
       onLevelChange(true);
       levelEl.focus();
       return;
@@ -113,6 +112,7 @@
   window.addEventListener("popstate", fromLocation);
 
   function doJump() {
+    if (!jumpEl) return;
     var rawInput = String(jumpEl.value || "");
     var runs = rawInput.match(/\d+/g) || [];
     var num = "";
@@ -144,12 +144,11 @@
       return;
     }
     selectStandard(num, externalEl.value !== num);
-    jumpEl.focus();
-    jumpEl.select();
+    if (jumpEl) { jumpEl.focus(); jumpEl.select(); }
   }
 
-  if (jumpGo) {
-    jumpGo.addEventListener("click", doJump);
+  if (jumpGo) jumpGo.addEventListener("click", doJump);
+  if (jumpEl) {
     jumpEl.addEventListener("keydown", function (e) {
       if (e.key === "Enter") { e.preventDefault(); doJump(); }
     });
@@ -370,6 +369,7 @@
     lastHash = "";
     try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
     try { localStorage.removeItem("ncea-papers-last"); } catch (e) {}
+    if (jumpEl) jumpEl.value = "";
   }
 
   function onLevelChange(silent) {

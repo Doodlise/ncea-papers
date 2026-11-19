@@ -57,7 +57,7 @@ REQUIRE_UI=1 node verify_ui.js                    # behavioural checks (required
 Open `index.html` directly, or run `python3 -m http.server 8000` in this folder.
 
 UI regression test (Node + jsdom, installed locally via `package.json`):
-`REQUIRE_UI=1 node verify_ui.js` runs at least 29 behavioural checks. `rebuild_all.sh` installs jsdom if
+`REQUIRE_UI=1 node verify_ui.js` self-checks its own count (currently 29). `rebuild_all.sh` installs jsdom if
 needed and treats this test as required; set `SKIP_UI=1` to opt out offline.
 The link sample is also required unless `SKIP_LINK_SAMPLE=1` is set.
 
