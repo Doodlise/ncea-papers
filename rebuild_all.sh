@@ -25,7 +25,7 @@ fi
 echo "=== UI smoke test ==="
 if [ "${SKIP_UI:-0}" != "1" ]; then
   if [ ! -d node_modules/jsdom ]; then
-    npm install --no-save --silent jsdom@22
+    npm ci --silent
   fi
   REQUIRE_UI=1 node verify_ui.js
 else

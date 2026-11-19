@@ -131,7 +131,7 @@
       var candidates = runs.filter(function (r) { return !/^(19|20)\d{2}$/.test(r); });
       var typed = candidates.length ? candidates[candidates.length - 1]
         : (runs.length ? runs[runs.length - 1] : rawInput.replace(/\D/g, ""));
-      if (/^(19|20)\d{2}$/.test(typed)) typed = "";
+      if (/^(19|20)\d{2}$/.test(typed) || typed.length < 3) typed = "";
       if (typed.length > 12) typed = typed.slice(0, 12) + "…";
       hintEl.textContent = typed
         ? "No papers listed for " + typed + ". Check the number."

@@ -15,12 +15,23 @@ class AnchorParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.anchors: list[str] = []
+        self.pdf_anchors: list[str] = []
 
     def handle_starttag(self, tag, attrs):
-        if tag == "a":
-            href = dict(attrs).get("href")
-            if href:
-                self.anchors.append(href)
+        if tag != "a":
+            return
+        attrs = dict(attrs)
+        href = attrs.get("href")
+        if href:
+            self.anchors.append(href)
+        if str(attrs.get("class", "")).startswith("pdf-") and href:
+            self.pdf_anchors.append(href)
+
+
+def pdf_hrefs(text: str) -> list[str]:
+    parser = AnchorParser()
+    parser.feed(text)
+    return parser.pdf_anchors
 
 
 class ScriptParser(HTMLParser):
@@ -42,7 +53,6 @@ JARGON = re.compile(
     r"Examination paper|Assessment schedule|Assessment report|assessment paper|Examination audio or video transcript",
     re.I,
 )
-PDF_ANCHOR = re.compile(r'class="pdf-[^"]*" href="([^"]+)"')
 
 errors: list[str] = []
 
@@ -293,10 +303,9 @@ def main() -> int:
         anchor_text = " ".join(re.findall(r">([^<>]+)</a>", page))
         jargon = len(JARGON.findall(anchor_text))
         check(jargon == 0, f"generated link text uses student-friendly wording (jargon: {jargon})")
-        check(page.count('class="pdf-') == len(urls),
-              f"all.html contains all {len(urls):,} PDF anchors (found {page.count('class=\"pdf-')})")
-        pdf_hrefs = PDF_ANCHOR.findall(page)
-        check(sorted(pdf_hrefs) == sorted(urls), "all.html PDF hrefs match data URLs")
+        check(len(pdf_hrefs(page)) == len(urls),
+              f"all.html contains all {len(urls):,} PDF anchors (found {len(pdf_hrefs(page))})")
+        check(sorted(pdf_hrefs(page)) == sorted(urls), "all.html PDF hrefs match data URLs")
         note = "No question paper is listed"
         blocks = [b for b in re.split(r"(?=<h4>)", page) if "<h4>" in b]
         note_blocks = [b for b in blocks if note in b]
@@ -319,7 +328,7 @@ def main() -> int:
             for l in ("1", "2", "3") for std in s["levels"][l]["standards"]
             for d in std["documents"]
         )
-        if sorted(PDF_ANCHOR.findall(text)) != expected:
+        if sorted(pdf_hrefs(text)) != expected:
             per_page_bad.append(slug)
         if JARGON.findall(" ".join(re.findall(r">([^<>]+)</a>", text))):
             per_page_bad.append(slug + ":jargon")

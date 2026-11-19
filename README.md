@@ -41,7 +41,7 @@ dead links were removed.
 
 ```bash
 cd ncea-papers
-../.venv/bin/pip install beautifulsoup4
+../.venv/bin/pip install beautifulsoup4==4.15.0
 ../.venv/bin/python scrape.py        # network, ~15 min
 ../.venv/bin/python enrich.py        # network, ~12 min
 ../.venv/bin/python fix_and_prune.py # network, checks every PDF
