@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 cd "$(dirname "$0")"
-../.venv/bin/pip install -q beautifulsoup4
+../.venv/bin/pip install -q beautifulsoup4==4.15.0
 echo "=== scrape ==="
 ../.venv/bin/python scrape.py
 echo "=== enrich ==="
