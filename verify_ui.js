@@ -27,7 +27,9 @@ function boot(url, seed) {
 }
 
 let failures = 0;
+let executed = 0;
 function check(ok, name) {
+  executed++;
   console.log((ok ? "  ok   " : "  FAIL ") + name);
   if (!ok) failures++;
 }
@@ -88,6 +90,7 @@ w.location.hash = "#picker";
 w.dispatchEvent(new w.Event("hashchange"));
 check(d.getElementById("level").value === "", "#picker mid-session resets level");
 check(d.activeElement && d.activeElement.id === "level", "picker reset returns focus to level select");
+check(d.getElementById("jump").value === "", "picker reset clears the jump field");
 
 w = boot("http://localhost/");
 d = w.document;
@@ -103,6 +106,7 @@ d = w.document;
 d.getElementById("jump").value = "2025 99999";
 d.getElementById("jump-go").click();
 check(/99999/.test(d.getElementById("hint").textContent), "invalid multi-token jump names the right token");
+check(d.activeElement && d.activeElement.id === "jump", "invalid jump focuses the jump field");
 
 w = boot("http://localhost/");
 d = w.document;
@@ -202,6 +206,11 @@ async function finish() {
         && bd.querySelectorAll("#files a").length === 0,
         "popstate/back fully resets the picker");
 
+  if (executed < 29) {
+    console.log(`FAIL only ${executed} UI checks executed (expected at least 29)`);
+    process.exit(1);
+  }
+  console.log(`UI checks executed: ${executed}`);
   console.log(failures ? `\nUI smoke test FAILED: ${failures}` : "\nUI smoke test PASSED");
   process.exit(failures ? 1 : 0);
 }

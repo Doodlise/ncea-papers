@@ -94,6 +94,7 @@
       lastHash = "";
       clearSaved();
       levelEl.value = "";
+      if (jumpEl) jumpEl.value = "";
       onLevelChange(true);
       levelEl.focus();
       return;
@@ -139,6 +140,7 @@
         ? "No papers listed for " + typed + ". Check the number."
         : "Enter a standard number to jump straight to its papers.";
       filesEl.innerHTML = "";
+      if (jumpEl) { jumpEl.focus(); jumpEl.select(); }
       return;
     }
     selectStandard(num, externalEl.value !== num);
