@@ -263,6 +263,7 @@ def main() -> int:
     check('aria-live="polite"' in idx, "status changes announced to screen readers")
     check('<main id="main">' in idx, "main landmark present")
     check('class="skip" href="#main"' in idx, "skip link present on picker")
+    check('name="referrer" content="no-referrer"' in idx, "no-referrer policy present on picker")
     check('name="description"' in idx, "index meta description present")
     check('id="external-label"' not in idx, "no dead attribute")
     parser = ScriptParser()
@@ -319,6 +320,8 @@ def main() -> int:
             if href.startswith(("index.html", "all.html", "privacy.html", "accessibility.html",
                                 "disclaimer.html", "subjects/", "../..", "styles.css", "#")):
                 continue
+            if href in ("data:,", "https://www2.nzqa.govt.nz/about-this-site/copyright/"):
+                continue
             if href == "https://github.com/Doodlise/ncea-papers/issues":
                 continue
             if re.search(r"\.pdf$", href, re.I) and href.startswith("https://www.nzqa.govt.nz/"):
@@ -331,7 +334,10 @@ def main() -> int:
     broken_anchors = []
     stale_dates = []
     expected_date = "List last checked " + payload.get("generated", "")[:10]
-    for page_path in [ROOT / "index.html", ROOT / "all.html"] + list((ROOT / "subjects").glob("*/index.html")):
+    all_pages = ([ROOT / "index.html", ROOT / "all.html", ROOT / "privacy.html",
+                  ROOT / "accessibility.html", ROOT / "disclaimer.html"]
+                 + list((ROOT / "subjects").glob("*/index.html")))
+    for page_path in all_pages:
         if not page_path.exists():
             continue  # existence already reported by the Build outputs check
         text = read(page_path)
@@ -339,8 +345,11 @@ def main() -> int:
         check(not bad, f"{page_path.relative_to(ROOT)} has no non-PDF links" + (f" (bad: {bad[:2]})" if bad else ""))
         if page_path.name != "index.html" and expected_date not in text:
             stale_dates.append(page_path.name)
-        if 'class="skip" href="#main"' not in text or "site-footer" not in text:
-            broken_anchors.append(page_path.name + ":accessibility-notice")
+        if ('class="skip" href="#main"' not in text or 'id="main"' not in text
+                or 'name="referrer" content="no-referrer"' not in text
+                or "site-footer" not in text
+                or "Not operated by, affiliated with, or endorsed by" not in text):
+            broken_anchors.append(page_path.name + ":compliance-notice")
         ids = set(re.findall(r'id="([^"]+)"', text))
         for anchor in re.findall(r'href="#([^"]+)"', text):
             if anchor and anchor not in ids:

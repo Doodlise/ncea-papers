@@ -49,6 +49,7 @@ def page_shell(title: str, description: str, body: str, prefix: str, generated: 
         '<!DOCTYPE html><html lang="en-NZ"><head><meta charset="utf-8">'
         '<meta name="viewport" content="width=device-width, initial-scale=1">'
         '<meta name="referrer" content="no-referrer">'
+        '<link rel="icon" href="data:,">'
         + (f'<meta name="description" content="{esc(description)}">' if description else "")
         + f'<title>{esc(title)}</title>'
         f'<link rel="stylesheet" href="{prefix}styles.css"></head><body>'

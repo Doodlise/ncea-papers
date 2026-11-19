@@ -34,6 +34,8 @@ dead links were removed.
 | `index.html`, `app.js`, `styles.css` | Three-step picker (level → subject → standard). |
 | `all.html` | Complete plain list of all PDFs. |
 | `subjects/<slug>/index.html` | Static PDF list per subject. |
+| `privacy.html`, `accessibility.html`, `disclaimer.html` | Generated legal/notices pages; do not hand-edit. |
+| `friendly.json` | Shared label-cleaning rules used by both renderers. |
 
 ## Rebuild
 
