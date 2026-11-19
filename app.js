@@ -279,6 +279,7 @@
     if (!lvl) { hintEl.textContent = "Start here — pick your level above."; return; }
     if (!slug) { hintEl.textContent = "Next — pick your subject."; return; }
     if (!key) {
+      clearSaved();
       hintEl.textContent = step3Prompt(externalEl.options.length - 1);
       return;
     }

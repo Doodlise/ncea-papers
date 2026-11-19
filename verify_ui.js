@@ -75,7 +75,7 @@ check(!w.location.hash, "malformed hash stripped from URL");
 w = boot("http://localhost/");
 d = w.document;
 d.getElementById("level").value = "2";
-d.dispatchEvent(new w.Event("change"));
+d.getElementById("level").dispatchEvent(new w.Event("change"));
 w.location.hash = "#picker";
 w.dispatchEvent(new w.Event("hashchange"));
 check(d.getElementById("level").value === "", "#picker mid-session resets level");

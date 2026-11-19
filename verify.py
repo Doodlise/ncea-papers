@@ -11,6 +11,18 @@ from collections import Counter
 from pathlib import Path
 from urllib.parse import urlparse
 
+class AnchorParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.anchors: list[str] = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "a":
+            href = dict(attrs).get("href")
+            if href:
+                self.anchors.append(href)
+
+
 class ScriptParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -315,8 +327,10 @@ def main() -> int:
 
     # Generated pages: every resource link must be a direct NZQA PDF.
     def bad_hrefs(text: str, page_path: Path) -> list[str]:
+        parser = AnchorParser()
+        parser.feed(text)
         bad = []
-        for href in re.findall(r"href\s*=\s*[\"']?([^\"'\s>]+)", text):
+        for href in parser.anchors:
             if href.startswith(("index.html", "all.html", "privacy.html", "accessibility.html",
                                 "disclaimer.html", "subjects/", "../..", "styles.css", "#")):
                 continue
@@ -341,8 +355,7 @@ def main() -> int:
         if not page_path.exists():
             continue  # existence already reported by the Build outputs check
         text = read(page_path)
-        # The favicon data-URI is a <link>, not an anchor; remove it before scanning.
-        bad = bad_hrefs(text.replace('<link rel="icon" href="data:,">', ""), page_path)
+        bad = bad_hrefs(text, page_path)
         check(not bad, f"{page_path.relative_to(ROOT)} has no non-PDF links" + (f" (bad: {bad[:2]})" if bad else ""))
         if page_path != ROOT / "index.html" and expected_date not in text:
             stale_dates.append(str(page_path.relative_to(ROOT)))
