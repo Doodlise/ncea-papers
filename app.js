@@ -420,7 +420,9 @@
       var last = JSON.parse(localStorage.getItem("ncea-papers-last") || "null");
       if (last && numberIndex[last.key]) selectStandard(last.key);
       else if (last) localStorage.removeItem("ncea-papers-last");
-    } catch (e) { /* ignore unavailable or corrupt storage */ }
+    } catch (e) {
+      try { localStorage.removeItem("ncea-papers-last"); } catch (ignored) {}
+    }
   }
   booting = false;
 })();

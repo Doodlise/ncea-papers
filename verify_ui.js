@@ -1,5 +1,5 @@
-/* Optional behavioural smoke test for the picker (needs jsdom).
- * Run: NODE_PATH=/path/to/node_modules node verify_ui.js
+/* Behavioural smoke test for the picker (needs jsdom; REQUIRE_UI=1 makes it fatal).
+ * Run: REQUIRE_UI=1 node verify_ui.js   (after npm ci)
  */
 const fs = require("fs");
 const path = require("path");

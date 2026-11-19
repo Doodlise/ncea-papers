@@ -253,21 +253,34 @@ def main() -> int:
     print("\nBuild outputs")
     for name in ("index.html", "all.html", "data.js", "app.js", "styles.css",
                  "verify_ui.js", "friendly.json", "package.json",
-                 "privacy.html", "accessibility.html", "disclaimer.html"):
+                 "privacy.html", "accessibility.html", "disclaimer.html",
+                 "package-lock.json"):
         check((ROOT / name).exists(), f"{name} exists")
     check(len(list((ROOT / "subjects").glob("*/index.html"))) > 20, "subject pages exist")
     ui_js = read(ROOT / "verify_ui.js")
     ui_calls = len(re.findall(r"^\s*check\(", ui_js, re.M))
     check(ui_calls == 23, f"UI smoke suite has exactly 23 checks (found {ui_calls})")
+    try:
+        pin = json.loads(read(ROOT / "package.json"))["devDependencies"]["jsdom"]
+        lock = json.loads(read(ROOT / "package-lock.json"))
+        lock_pin = lock["packages"][""]["devDependencies"]["jsdom"]
+        installed = lock["packages"]["node_modules/jsdom"]["version"]
+        check(pin == lock_pin == installed, f"jsdom pin consistent across manifest and lock ({pin})")
+    except Exception as exc:  # noqa: BLE001
+        check(False, f"jsdom lockfile consistent ({exc})")
     rebuild = read(ROOT / "rebuild_all.sh")
     active = "\n".join(line.split("#", 1)[0] for line in rebuild.splitlines())
     check(bool(re.search(r"^\s*\.\./\.venv/bin/python test_links\.py\s*$", active, re.M))
           and bool(re.search(r"^\s*REQUIRE_UI=1 node verify_ui\.js\s*$", active, re.M)),
           "pipeline invokes both live check commands")
-    check("SKIP_LINK_SAMPLE" in active and "SKIP_UI" in active
+    check(bool(re.search(r'^\s*if\s+\[\s*"\$\{SKIP_LINK_SAMPLE:-0\}"\s*=', active, re.M))
+          and bool(re.search(r'^\s*if\s+\[\s*"\$\{SKIP_UI:-0\}"', active, re.M))
           and "jsdom/package.json" in active
           and "require('./package.json')" in active,
-          "pipeline keeps both opt-outs and reads the pinned UI version")
+          "pipeline keeps both real opt-out conditions and reads the pinned UI version")
+    check(bool(re.search(r"^\s*\.\./\.venv/bin/python build\.py\s*$", active, re.M))
+          and bool(re.search(r"^\s*\.\./\.venv/bin/python verify\.py\s*$", active, re.M)),
+          "pipeline runs the build and verifier")
     try:
         subprocess_run = __import__("subprocess").run(
             ["sh", "-n", str(ROOT / "rebuild_all.sh")], capture_output=True, timeout=5
