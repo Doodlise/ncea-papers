@@ -35,6 +35,7 @@
   data.subjects.forEach(function (s) {
     ["1", "2", "3"].forEach(function (lvl) {
       (((s.levels || {})[lvl] || {}).standards || []).forEach(function (std) {
+        if (!(std.documents || []).length) return;
         if (!numberIndex[std.number]) {
           numberIndex[std.number] = { slug: s.slug, lvl: lvl };
         }
@@ -94,6 +95,7 @@
       clearSaved();
       levelEl.value = "";
       onLevelChange(true);
+      levelEl.focus();
       return;
     }
     if (!numberIndex[num]) {
@@ -419,7 +421,7 @@
     try {
       var last = JSON.parse(localStorage.getItem("ncea-papers-last") || "null");
       if (last && numberIndex[last.key]) selectStandard(last.key);
-      else if (last) localStorage.removeItem("ncea-papers-last");
+      else localStorage.removeItem("ncea-papers-last");
     } catch (e) {
       try { localStorage.removeItem("ncea-papers-last"); } catch (ignored) {}
     }

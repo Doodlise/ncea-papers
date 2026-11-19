@@ -259,7 +259,7 @@ def main() -> int:
     check(len(list((ROOT / "subjects").glob("*/index.html"))) > 20, "subject pages exist")
     ui_js = read(ROOT / "verify_ui.js")
     ui_calls = len(re.findall(r"^\s*check\(", ui_js, re.M))
-    check(ui_calls == 23, f"UI smoke suite has exactly 23 checks (found {ui_calls})")
+    check(ui_calls >= 23, f"UI smoke suite has at least 23 checks (found {ui_calls})")
     try:
         pin = json.loads(read(ROOT / "package.json"))["devDependencies"]["jsdom"]
         lock = json.loads(read(ROOT / "package-lock.json"))

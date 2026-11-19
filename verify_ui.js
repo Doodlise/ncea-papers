@@ -38,6 +38,12 @@ check(/Standard 91174/.test(w.document.getElementById("hint").textContent), "col
 w = boot("http://localhost/", { key: "91123" });
 check(/Standard 91123/.test(w.document.getElementById("hint").textContent), "cold localStorage recall works");
 
+w = new JSDOM(html, { url: "http://localhost/", runScripts: "outside-only" }).window;
+w.localStorage.setItem("ncea-papers-last", "0");
+w.eval(dataJs);
+w.eval(appJs);
+check(w.localStorage.getItem("ncea-papers-last") === null, "falsy corrupt saved state self-heals");
+
 w = boot("http://localhost/#99999", { key: "91123" });
 check(/No papers listed for 99999/.test(w.document.getElementById("hint").textContent), "invalid hash gives a clear hint");
 check(w.localStorage.getItem("ncea-papers-last") === null, "invalid hash clears saved selection");
@@ -122,7 +128,7 @@ check(d.getElementById("hint").textContent === "Start here — pick your level a
 
 async function finish() {
   // Full picker/static-page parity sweep across every standard, driven only
-  // by native hash events (no manual dispatch), comparing labels AND hrefs
+  // via the jump control (deterministic in jsdom), comparing labels AND hrefs
   // with entities decoded via the DOM.
   const pw = boot("http://localhost/");
   const pd = pw.document;
