@@ -142,6 +142,8 @@
       return;
     }
     selectStandard(num, externalEl.value !== num);
+    jumpEl.focus();
+    jumpEl.select();
   }
 
   if (jumpGo) {

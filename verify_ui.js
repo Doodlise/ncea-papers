@@ -57,6 +57,8 @@ let d = w.document;
 d.getElementById("jump").value = "91174";
 d.getElementById("jump-go").click();
 check(/Standard 91174/.test(d.getElementById("hint").textContent), "jump selects standard");
+check(d.querySelector("#files .back-link a")?.getAttribute("href") === "#picker",
+      "back-to-picker link targets #picker");
 w.location.hash = "#99999";
 w.dispatchEvent(new w.Event("hashchange"));
 check(d.querySelectorAll("#files a").length === 0, "invalid hash clears results");
@@ -85,6 +87,7 @@ d.getElementById("level").dispatchEvent(new w.Event("change"));
 w.location.hash = "#picker";
 w.dispatchEvent(new w.Event("hashchange"));
 check(d.getElementById("level").value === "", "#picker mid-session resets level");
+check(d.activeElement && d.activeElement.id === "level", "picker reset returns focus to level select");
 
 w = boot("http://localhost/");
 d = w.document;
@@ -117,6 +120,19 @@ check(echoed.length < 60 && echoed.includes("…"), "long invalid token is cappe
 w = boot("http://localhost/#000091404");
 check(/Standard 91404/.test(w.document.getElementById("hint").textContent),
       "leading-zero deep link is normalized");
+
+// A standard with no documents must not be jumpable (guards the filtered index).
+const doctored = JSON.parse(dataJs.replace(/^window\.NCEA_DATA\s*=\s*/, "").replace(/;\s*$/, ""));
+doctored.subjects.forEach(s => ["1", "2", "3"].forEach(l =>
+  s.levels[l].standards.forEach(std => { if (std.number === "91174") std.documents = []; })));
+w = new JSDOM(html, { url: "http://localhost/", runScripts: "outside-only" }).window;
+w.eval("window.NCEA_DATA = " + JSON.stringify(doctored) + ";");
+w.eval(appJs);
+d = w.document;
+d.getElementById("jump").value = "91174";
+d.getElementById("jump-go").click();
+check(/No papers listed for 91174/.test(d.getElementById("hint").textContent),
+      "document-less standard is not jumpable");
 
 w = boot("http://localhost/");
 d = w.document;
