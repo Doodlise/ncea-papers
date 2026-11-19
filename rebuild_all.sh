@@ -24,7 +24,7 @@ else
 fi
 echo "=== UI smoke test ==="
 if [ "${SKIP_UI:-0}" != "1" ]; then
-  if ! node -e "require('jsdom')" >/dev/null 2>&1; then
+  if ! node -e "process.exit(require('jsdom/package.json').version === '22.1.0' ? 0 : 1)" >/dev/null 2>&1; then
     echo "Installing locked UI test dependencies (npm ci)..."
     npm ci
   fi

@@ -263,6 +263,16 @@ def main() -> int:
     check(bool(re.search(r"^\s*\.\./\.venv/bin/python test_links\.py\s*$", rebuild, re.M))
           and bool(re.search(r"^\s*REQUIRE_UI=1 node verify_ui\.js\s*$", rebuild, re.M)),
           "pipeline invokes both live check commands")
+    check("SKIP_LINK_SAMPLE" in rebuild and "SKIP_UI" in rebuild
+          and "jsdom/package.json" in rebuild,
+          "pipeline documents opt-outs and pins the UI dependency")
+    try:
+        subprocess_run = __import__("subprocess").run(
+            ["sh", "-n", str(ROOT / "rebuild_all.sh")], capture_output=True, timeout=5
+        )
+        check(subprocess_run.returncode == 0, "rebuild_all.sh has valid shell syntax")
+    except Exception as exc:  # noqa: BLE001
+        check(False, f"rebuild_all.sh syntax check failed ({exc})")
     if (ROOT / "data.js").exists():
         js = read(ROOT / "data.js")
         check(js.startswith("window.NCEA_DATA = "), "data.js assigns window.NCEA_DATA")

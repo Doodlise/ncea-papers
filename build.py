@@ -12,6 +12,8 @@ import shutil
 import urllib.parse
 from pathlib import Path
 
+import atomic
+
 ROOT = Path(__file__).resolve().parent
 DATA = ROOT / "data" / "subjects.json"
 
@@ -58,10 +60,7 @@ def page_shell(title: str, description: str, body: str, prefix: str, generated: 
     )
 
 
-def write_atomic(path: Path, text: str) -> None:
-    tmp = path.with_name(path.name + ".tmp")
-    tmp.write_text(text, encoding="utf-8")
-    os.replace(tmp, path)
+write_atomic = atomic.write
 
 
 ALLOWED_HOSTS = {"www.nzqa.govt.nz", "www2.nzqa.govt.nz"}
