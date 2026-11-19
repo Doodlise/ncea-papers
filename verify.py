@@ -260,12 +260,14 @@ def main() -> int:
     ui_calls = len(re.findall(r"^\s*check\(", ui_js, re.M))
     check(ui_calls == 23, f"UI smoke suite has exactly 23 checks (found {ui_calls})")
     rebuild = read(ROOT / "rebuild_all.sh")
-    check(bool(re.search(r"^\s*\.\./\.venv/bin/python test_links\.py\s*$", rebuild, re.M))
-          and bool(re.search(r"^\s*REQUIRE_UI=1 node verify_ui\.js\s*$", rebuild, re.M)),
+    active = "\n".join(line.split("#", 1)[0] for line in rebuild.splitlines())
+    check(bool(re.search(r"^\s*\.\./\.venv/bin/python test_links\.py\s*$", active, re.M))
+          and bool(re.search(r"^\s*REQUIRE_UI=1 node verify_ui\.js\s*$", active, re.M)),
           "pipeline invokes both live check commands")
-    check("SKIP_LINK_SAMPLE" in rebuild and "SKIP_UI" in rebuild
-          and "jsdom/package.json" in rebuild,
-          "pipeline documents opt-outs and pins the UI dependency")
+    check("SKIP_LINK_SAMPLE" in active and "SKIP_UI" in active
+          and "jsdom/package.json" in active
+          and "require('./package.json')" in active,
+          "pipeline keeps both opt-outs and reads the pinned UI version")
     try:
         subprocess_run = __import__("subprocess").run(
             ["sh", "-n", str(ROOT / "rebuild_all.sh")], capture_output=True, timeout=5

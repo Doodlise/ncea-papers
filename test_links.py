@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import json
+import os
 import random
 import time
 import urllib.request
@@ -21,7 +22,10 @@ def main() -> int:
             info = s["levels"][lvl]
             for std in info["standards"]:
                 docs.extend((s["name"], lvl, d) for d in std["documents"])
-    random.seed()  # rotate the sample between runs to catch newly dead links
+    seed = os.environ.get("LINK_SAMPLE_SEED")
+    if seed is None:
+        seed = str(random.SystemRandom().randrange(2 ** 32))  # rotate each run
+    random.seed(seed)
     sample = random.sample(docs, min(30, len(docs)))
     ok = 0
     for subject, lvl, d in sample:
@@ -43,7 +47,7 @@ def main() -> int:
         if good:
             ok += 1
         print(f"{'PASS' if good else 'FAIL'} | L{lvl} {subject[:22]:22} | {ctype[:22]:22} | {url[-58:]}")
-    print(f"\n{ok}/{len(sample)} sampled PDFs open correctly")
+    print(f"\n{ok}/{len(sample)} sampled PDFs open correctly (seed={seed}; replay with LINK_SAMPLE_SEED={seed})")
     return 0 if ok == len(sample) else 1
 
 

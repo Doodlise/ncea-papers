@@ -364,7 +364,12 @@ def main() -> int:
         shutil.rmtree(backup)
     if subjects_dir.exists():
         os.replace(subjects_dir, backup)
-    os.replace(tmp_dir, subjects_dir)
+    try:
+        os.replace(tmp_dir, subjects_dir)
+    except Exception:
+        if backup.exists():
+            os.replace(backup, subjects_dir)
+        raise
     # All rendering succeeded; only now replace the top-level artifacts.
     write_atomic(ROOT / "data.js", js)
     write_atomic(ROOT / "all.html", shell)

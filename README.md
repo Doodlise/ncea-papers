@@ -26,7 +26,7 @@ dead links were removed.
 | `verify.py` | Check that the result is PDF-only, linked and complete. |
 | `test_links.py` | Rotating live spot-check: fetch 30 random PDFs (required unless `SKIP_LINK_SAMPLE=1`). |
 | `rebuild_all.sh` | Runs the full pipeline in order. |
-| `verify_ui.js` | Optional behavioural smoke test for the picker (needs jsdom). |
+| `verify_ui.js` | Behavioural smoke test for the picker (required unless `SKIP_UI=1`). |
 | `data/subjects.json` | Cleaned data (the source for the site). |
 | `data/link_report.json` | Per-URL HTTP status from the link check. |
 | `data/baseline.json` | Snapshot of subjects/standards; verify fails if any disappear. |
