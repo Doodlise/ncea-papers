@@ -236,7 +236,7 @@ def main() -> int:
     check(len(list((ROOT / "subjects").glob("*/index.html"))) > 20, "subject pages exist")
     ui_js = read(ROOT / "verify_ui.js")
     ui_calls = len(re.findall(r"^\s*check\(", ui_js, re.M))
-    check(ui_calls == 22, f"UI smoke suite has exactly 22 checks (found {ui_calls})")
+    check(ui_calls == 23, f"UI smoke suite has exactly 23 checks (found {ui_calls})")
     rebuild = read(ROOT / "rebuild_all.sh")
     check("REQUIRE_UI=1" in rebuild and "SKIP_LINK_SAMPLE" in rebuild,
           "pipeline wires fatal UI test and link-sample opt-out")
@@ -320,8 +320,6 @@ def main() -> int:
             if href.startswith(("index.html", "all.html", "privacy.html", "accessibility.html",
                                 "disclaimer.html", "subjects/", "../..", "styles.css", "#")):
                 continue
-            if href == "data:," and 'rel="icon" href="data:,"' in text:
-                continue
             if href == "https://www2.nzqa.govt.nz/about-this-site/copyright/" and page_path.name == "disclaimer.html":
                 continue
             if href == "https://github.com/Doodlise/ncea-papers/issues":
@@ -343,7 +341,8 @@ def main() -> int:
         if not page_path.exists():
             continue  # existence already reported by the Build outputs check
         text = read(page_path)
-        bad = bad_hrefs(text, page_path)
+        # The favicon data-URI is a <link>, not an anchor; remove it before scanning.
+        bad = bad_hrefs(text.replace('<link rel="icon" href="data:,">', ""), page_path)
         check(not bad, f"{page_path.relative_to(ROOT)} has no non-PDF links" + (f" (bad: {bad[:2]})" if bad else ""))
         if page_path != ROOT / "index.html" and expected_date not in text:
             stale_dates.append(str(page_path.relative_to(ROOT)))
@@ -355,8 +354,12 @@ def main() -> int:
             broken_anchors.append(str(page_path.relative_to(ROOT)) + ":compliance-notice")
         ids = set(re.findall(r'id="([^"]+)"', text))
         for anchor in re.findall(r'href="#([^"]+)"', text):
-            if anchor and anchor not in ids:
+            if not anchor:
+                continue
+            if anchor not in ids:
                 broken_anchors.append(f"{page_path.relative_to(ROOT)}#{anchor}")
+            elif anchor != "main" and f'id="{anchor}" tabindex="-1"' not in text:
+                broken_anchors.append(f"{page_path.relative_to(ROOT)}#{anchor}:not-focusable")
     check(not broken_anchors, f"all in-page links resolve (broken: {broken_anchors[:5]})")
     check(not stale_dates, f"all generated pages carry the current date (stale: {stale_dates[:5]})")
 

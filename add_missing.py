@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import re
 import time
+from datetime import datetime, timezone
 import urllib.request
 from pathlib import Path
 
@@ -290,6 +291,7 @@ def main() -> int:
             "papers_and_schedules": sum(len(st["documents"]) for s in payload["subjects"]
                                         for l in ("1", "2", "3") for st in s["levels"][l]["standards"]),
         })
+    payload["generated"] = datetime.now(timezone.utc).isoformat()
     DATA.write_text(json.dumps(payload, indent=1, ensure_ascii=False), encoding="utf-8")
     print(f"added {added_subjects} subjects, {len(added_urls)} new PDFs; total {len(payload['subjects'])} subjects")
     return 0

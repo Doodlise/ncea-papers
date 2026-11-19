@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import re
 import time
+from datetime import datetime, timezone
 import urllib.parse
 import urllib.request
 from collections import Counter
@@ -157,6 +158,8 @@ def main() -> int:
     ]
     stats["subjects_removed_dead"] = before - len(payload["subjects"])
 
+    # The full live URL check finishes here; that is the honest "last checked" date.
+    payload["generated"] = datetime.now(timezone.utc).isoformat()
     payload["prune_report"] = dict(stats)
     payload["prune_report"]["urls_checked"] = len(urls)
     payload["prune_report"]["urls_live"] = sum(1 for v in statuses.values() if v in (200, 206))

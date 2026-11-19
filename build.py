@@ -243,14 +243,14 @@ def main() -> int:
     # all.html — every PDF, grouped by level, subject, standard, year.
     generated = payload.get("generated", "")[:10]
     body = [
-        '<h1 id="top">NCEA Past Papers — all PDFs</h1>',
+        '<h1 id="top" tabindex="-1">NCEA Past Papers — all PDFs</h1>',
         "<p>Past papers and answer schedules. Every link opens a direct NZQA PDF in a new tab. Coverage is mainly 2021–2026; answer schedules for the newest year often come out later.</p>",
         '<p>Works offline — only the PDF links need internet.</p>',
         '<nav><a href="#level-1">Level 1</a> | <a href="#level-2">Level 2</a> | <a href="#level-3">Level 3</a> | <a href="#top">Back to top</a></nav>',
         '<p class="back-link"><a href="index.html">Back to the picker</a></p>',
     ]
     for lvl in ("1", "2", "3"):
-        body.append(f'<h2 id="level-{lvl}">Level {lvl}</h2>')
+        body.append(f'<h2 id="level-{lvl}" tabindex="-1">Level {lvl}</h2>')
         body.append('<p class="back-link"><a href="#top">Back to top</a></p>')
         at_level = [s for s in subjects if s["levels"][lvl]["standards"]]
         for s in sorted(at_level, key=lambda x: x["name"].lower()):
@@ -318,7 +318,7 @@ def main() -> int:
     subject_pages = []
     for s in subjects:
         parts = [
-            f'<h1 id="top">{esc(s["name"])}</h1>',
+            f'<h1 id="top" tabindex="-1">{esc(s["name"])}</h1>',
             f"<p class=\"intro\">Past papers and answer schedules for {esc(s['name'])}. "
             "Every link opens a direct NZQA PDF in a new tab. Coverage is mainly 2021–2026; "
             "answer schedules for the newest year often come out later.</p>",
@@ -335,7 +335,7 @@ def main() -> int:
             info = s["levels"][lvl]
             if not info["standards"]:
                 continue
-            parts.append(f'<h2 id="level-{lvl}">{esc("Level " + lvl)}</h2>')
+            parts.append(f'<h2 id="level-{lvl}" tabindex="-1">{esc("Level " + lvl)}</h2>')
             for std in info["standards"]:
                 parts.append(f"<h3>{esc(std['number'])} — {esc(std.get('title', ''))}</h3>")
                 if all(re.search(r"answer|schedul|marking", friendly(d.get("label") or "PDF"), re.I)

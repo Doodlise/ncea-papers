@@ -82,12 +82,12 @@ Legend: [x] done and verified · [~] in progress · [ ] not started
 - [x] Fixed undefined `push` variable (pushState never ran), programmatic selections stripping history hash, invalid deep-link feedback, prose jump input, stale back-to-picker state.
 - [x] Fixed #picker hash misread as invalid standard, user level/subject changes not clearing saved state, invalid-hash stale results, duplicate jump history, year-prefixed prose jumps.
 - [x] Invalid hash/jump now fully resets picker (fixes valid-hash recovery after a typo), Back-to-picker clears saved state, case-insensitive label parity, verifier checks script order/reset invariant.
-- [x] #picker/invalid-hash cold loads clear saved selection and strip bad hash; added optional jsdom UI smoke test (now 22 checks, wired into rebuild_all.sh).
+- [x] #picker/invalid-hash cold loads clear saved selection and strip bad hash; added optional jsdom UI smoke test (now 23 checks, wired into rebuild_all.sh).
 - [x] Malformed percent-encoded hash feedback/cleanup, #picker mid-session full reset, global jump-number uniqueness guard.
 - [x] Public hosting prepared and deployed: WCAG 2.2 AA review (removed global `/` shortcut), skip links, privacy/accessibility/disclaimer pages, NZQA written attribution, no-referrer, GitHub Pages HTTPS.
 - [x] Live at https://doodlise.github.io/ncea-papers/ (Pages build verified, Lighthouse 1.00/1.00/1.00).
 - [x] Back-to-picker now uses native hash navigation (browser Back restores the standard); hash shape validation prevents oversized/control-character hints; leading-zero jump input resolved; UI smoke test made fatal in pipeline.
-- [x] Local jsdom devDependency + 22 UI smoke checks (adds signed hash, leading zeros, multi-token errors, #picker navigation, picker/static label parity); precompiled label regexes; invalid-token error uses last token.
+- [x] Local jsdom devDependency + 23 UI smoke checks (adds signed hash, leading zeros, multi-token errors, #picker navigation, picker/static label parity); precompiled label regexes; invalid-token error uses last token.
 - [x] UI test truly fatal in pipeline (REQUIRE_UI=1, SKIP_UI opt-out), verifier checks test-surface files, shared PDF-URL validation between picker and renderer, README updated.
 - [x] Short-digit jump input echoes the right token; leading-zero deep links normalized; friendly.json patterns validated in both Python and JS; parity sweep now deterministic and compares labels + URLs for all 255 standards.
 - [x] Applied top 3 over-engineering cuts: removed harvest-then-discard metadata, note/exemplar collectors, direct-document harvesting (-87 lines); all checks + Lighthouse still pass.

@@ -101,6 +101,13 @@ d.getElementById("jump").value = "2025 999";
 d.getElementById("jump-go").click();
 check(/999/.test(d.getElementById("hint").textContent), "short-digit jump echoes the short token");
 
+w = boot("http://localhost/");
+d = w.document;
+d.getElementById("jump").value = "9".repeat(5000);
+d.getElementById("jump-go").click();
+const echoed = d.getElementById("hint").textContent;
+check(echoed.length < 60 && echoed.includes("…"), "long invalid token is capped in the hint");
+
 w = boot("http://localhost/#000091404");
 check(/Standard 91404/.test(w.document.getElementById("hint").textContent),
       "leading-zero deep link is normalized");
@@ -165,7 +172,7 @@ async function finish() {
   bd.getElementById("jump").value = "91174";
   bd.getElementById("jump-go").click();
   bw.history.back();
-  await new Promise(resolve => setTimeout(resolve, 50));
+  await new Promise(resolve => setTimeout(resolve, 200));
   check(/Start here/.test(bd.getElementById("hint").textContent)
         && bd.getElementById("level").value === ""
         && bd.getElementById("subject").value === ""
