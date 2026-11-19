@@ -1,0 +1,7 @@
+{
+  "name": "ncea-papers-ui-check",
+  "private": true,
+  "devDependencies": {
+    "jsdom": "22.1.0"
+  }
+}

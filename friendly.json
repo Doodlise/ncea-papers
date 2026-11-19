@@ -1,0 +1,11 @@
+{
+  "pairs": [
+    ["Examination audio or video transcript", "Audio or video transcript"],
+    ["Sample assessment schedule", "Sample answer schedule"],
+    ["Answer schedule", "schedule"],
+    ["Assessment schedule", "Answer schedule"],
+    ["Examination paper", "Exam paper"],
+    ["assessment paper", "paper"],
+    ["NUmeracy", "Numeracy"]
+  ]
+}
