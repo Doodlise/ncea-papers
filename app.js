@@ -132,6 +132,7 @@
       var typed = candidates.length ? candidates[candidates.length - 1]
         : (runs.length ? runs[runs.length - 1] : rawInput.replace(/\D/g, ""));
       if (/^(19|20)\d{2}$/.test(typed)) typed = "";
+      if (typed.length > 12) typed = typed.slice(0, 12) + "…";
       hintEl.textContent = typed
         ? "No papers listed for " + typed + ". Check the number."
         : "Enter a standard number to jump straight to its papers.";

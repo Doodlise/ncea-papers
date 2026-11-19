@@ -53,7 +53,7 @@ def page_shell(title: str, description: str, body: str, prefix: str, generated: 
         + (f'<meta name="description" content="{esc(description)}">' if description else "")
         + f'<title>{esc(title)}</title>'
         f'<link rel="stylesheet" href="{prefix}styles.css"></head><body>'
-        + SKIP_LINK + '<main id="main">' + body + "</main>"
+        + SKIP_LINK + '<main id="main" tabindex="-1">' + body + "</main>"
         + site_footer(prefix, generated) + "</body></html>\n"
     )
 

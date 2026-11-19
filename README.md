@@ -24,7 +24,7 @@ dead links were removed.
 | `add_missing.py` | Add subjects/papers the main scrape misses (schedule-only subjects, Pacific languages, LitNum, newly published files). |
 | `build.py` | Render the site from the cleaned data. |
 | `verify.py` | Check that the result is PDF-only, linked and complete. |
-| `test_links.py` | Optional spot check: fetch 30 random PDFs from the final data. |
+| `test_links.py` | Rotating live spot-check: fetch 30 random PDFs (required unless `SKIP_LINK_SAMPLE=1`). |
 | `rebuild_all.sh` | Runs the full pipeline in order. |
 | `verify_ui.js` | Optional behavioural smoke test for the picker (needs jsdom). |
 | `data/subjects.json` | Cleaned data (the source for the site). |

@@ -23,8 +23,7 @@ a { color: #8ab4f8; text-decoration: underline; }
 a:visited { color: #c58af9; }
 a:hover { text-decoration: none; }
 hr { border: 0; border-top: 1px solid #6b6b6b; margin: 24px 0 10px; }
-.intro, .footer { color: #bbb; }
-.footer { font-size: 13px; }
+.intro { color: #bbb; }
 
 #picker { border: 1px solid #6b6b6b; padding: 12px; margin: 14px 0; background: #1c1c1c; }
 .step { margin: 8px 0; }

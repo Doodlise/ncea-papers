@@ -261,7 +261,7 @@ def main() -> int:
     idx = read(ROOT / "index.html")
     check('id="level"' in idx and 'id="subject"' in idx and 'id="external"' in idx, "3-step picker present")
     check('aria-live="polite"' in idx, "status changes announced to screen readers")
-    check('<main id="main">' in idx, "main landmark present")
+    check('<main id="main" tabindex="-1">' in idx, "focusable main landmark present")
     check('class="skip" href="#main"' in idx, "skip link present on picker")
     check('name="referrer" content="no-referrer"' in idx, "no-referrer policy present on picker")
     check('name="description"' in idx, "index meta description present")
@@ -314,13 +314,15 @@ def main() -> int:
     check(not per_page_bad, f"each subject page has its own PDF URLs and friendly labels (bad: {per_page_bad[:5]})")
 
     # Generated pages: every resource link must be a direct NZQA PDF.
-    def bad_hrefs(text: str) -> list[str]:
+    def bad_hrefs(text: str, page_path: Path) -> list[str]:
         bad = []
         for href in re.findall(r"href\s*=\s*[\"']?([^\"'\s>]+)", text):
             if href.startswith(("index.html", "all.html", "privacy.html", "accessibility.html",
                                 "disclaimer.html", "subjects/", "../..", "styles.css", "#")):
                 continue
-            if href in ("data:,", "https://www2.nzqa.govt.nz/about-this-site/copyright/"):
+            if href == "data:," and 'rel="icon" href="data:,"' in text:
+                continue
+            if href == "https://www2.nzqa.govt.nz/about-this-site/copyright/" and page_path.name == "disclaimer.html":
                 continue
             if href == "https://github.com/Doodlise/ncea-papers/issues":
                 continue
@@ -341,19 +343,20 @@ def main() -> int:
         if not page_path.exists():
             continue  # existence already reported by the Build outputs check
         text = read(page_path)
-        bad = bad_hrefs(text)
+        bad = bad_hrefs(text, page_path)
         check(not bad, f"{page_path.relative_to(ROOT)} has no non-PDF links" + (f" (bad: {bad[:2]})" if bad else ""))
-        if page_path.name != "index.html" and expected_date not in text:
-            stale_dates.append(page_path.name)
-        if ('class="skip" href="#main"' not in text or 'id="main"' not in text
+        if page_path != ROOT / "index.html" and expected_date not in text:
+            stale_dates.append(str(page_path.relative_to(ROOT)))
+        if ('class="skip" href="#main"' not in text
+                or '<main id="main" tabindex="-1">' not in text
                 or 'name="referrer" content="no-referrer"' not in text
                 or "site-footer" not in text
                 or "Not operated by, affiliated with, or endorsed by" not in text):
-            broken_anchors.append(page_path.name + ":compliance-notice")
+            broken_anchors.append(str(page_path.relative_to(ROOT)) + ":compliance-notice")
         ids = set(re.findall(r'id="([^"]+)"', text))
         for anchor in re.findall(r'href="#([^"]+)"', text):
             if anchor and anchor not in ids:
-                broken_anchors.append(f"{page_path.name}#{anchor}")
+                broken_anchors.append(f"{page_path.relative_to(ROOT)}#{anchor}")
     check(not broken_anchors, f"all in-page links resolve (broken: {broken_anchors[:5]})")
     check(not stale_dates, f"all generated pages carry the current date (stale: {stale_dates[:5]})")
 
